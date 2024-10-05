@@ -215,14 +215,20 @@ def drive_bone_mat(armature_name, bone_name, src_vars, intermediate_bones):
 	dest_ref_mat = rot_mat(ctx.target.matrix_world) @ rot_mat(rest_mat)
 	diff_mat = src_ref_mat.inverted() @ dest_ref_mat
 
-	scale = ctx.source.matrix_world.to_scale()
-	scale_mat = Matrix.Identity(4)
-	scale_mat[0][0] = scale.x
-	scale_mat[1][1] = scale.y
-	scale_mat[2][2] = scale.z
+	src_scale = ctx.source.matrix_world.to_scale()
+	src_scale_mat = Matrix.Identity(4)
+	src_scale_mat[0][0] = src_scale.x
+	src_scale_mat[1][1] = src_scale.y
+	src_scale_mat[2][2] = src_scale.z
+
+	dest_scale = ctx.target.matrix_world.to_scale()
+	dest_scale_mat = Matrix.Identity(4)
+	dest_scale_mat[0][0] = dest_scale.x
+	dest_scale_mat[1][1] = dest_scale.y
+	dest_scale_mat[2][2] = dest_scale.z
 
 	mat = Matrix.Translation(bone_loc) @ bone_rot.to_matrix().to_4x4()
-	mat = scale_mat @ mat
+	mat = dest_scale_mat.inverted() @ src_scale_mat @ mat
 	mat = diff_mat.inverted() @ mat @ diff_mat
 	mat = offset_mat @ mat
 	mat = mat
